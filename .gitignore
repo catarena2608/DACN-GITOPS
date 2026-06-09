@@ -1,0 +1,11 @@
+# Local/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Never commit plaintext env files or decrypted secrets
+.env
+.env.*
+*.dec.yaml
+*.decrypted.yaml

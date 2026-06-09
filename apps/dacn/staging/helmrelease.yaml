@@ -1,0 +1,120 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dacn
+  namespace: dacn-staging
+spec:
+  interval: 5m
+  releaseName: dacn-staging
+  targetNamespace: dacn-staging
+  dependsOn:
+    - name: mongodb
+      namespace: data
+    - name: redis
+      namespace: data
+    - name: rabbitmq
+      namespace: data
+  chart:
+    spec:
+      chart: ./deploy/helm/dacn
+      sourceRef:
+        kind: GitRepository
+        name: dacn-app
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    global:
+      environment: staging
+      domain: staging.dacn.local
+      imageTag: latest
+    services:
+      auth:
+        replicaCount: 1
+        env:
+          NODE_ENV: production
+          PORT: "3001"
+          REDIS_URL: redis://redis-master.data.svc.cluster.local:6379
+          JWT_EXPIRES_IN: 15m
+          JWT_REFRESH_EXPIRES_IN: 7d
+        envFromSecrets:
+          - dacn-auth-staging-secrets
+        autoscaling:
+          enabled: true
+          minReplicas: 1
+          maxReplicas: 3
+          targetCPUUtilizationPercentage: 70
+      product:
+        replicaCount: 1
+        env:
+          NODE_ENV: production
+          PORT: "3002"
+          REDIS_URL: redis://redis-master.data.svc.cluster.local:6379
+          RABBITMQ_URL: amqp://dacn:dacn-lab-password@rabbitmq.data.svc.cluster.local:5672
+        envFromSecrets:
+          - dacn-product-staging-secrets
+        autoscaling:
+          enabled: true
+          minReplicas: 1
+          maxReplicas: 3
+          targetCPUUtilizationPercentage: 70
+      order:
+        replicaCount: 1
+        env:
+          NODE_ENV: production
+          PORT: "3003"
+          REDIS_URL: redis://redis-master.data.svc.cluster.local:6379
+          RABBITMQ_URL: amqp://dacn:dacn-lab-password@rabbitmq.data.svc.cluster.local:5672
+        envFromSecrets:
+          - dacn-order-staging-secrets
+        autoscaling:
+          enabled: true
+          minReplicas: 1
+          maxReplicas: 3
+          targetCPUUtilizationPercentage: 70
+      gateway:
+        replicaCount: 1
+        env:
+          NODE_ENV: production
+          GATEWAY_PORT: "3000"
+          AUTH_SERVICE_URL: http://auth:3001
+          PRODUCT_SERVICE_URL: http://product:3002
+          ORDER_SERVICE_URL: http://order:3003
+          RATE_LIMIT_WINDOW_MS: "60000"
+          RATE_LIMIT_MAX_REQUESTS: "300"
+        envFromSecrets:
+          - dacn-gateway-staging-secrets
+        autoscaling:
+          enabled: true
+          minReplicas: 1
+          maxReplicas: 3
+          targetCPUUtilizationPercentage: 70
+      frontend:
+        replicaCount: 1
+        autoscaling:
+          enabled: false
+    ingress:
+      enabled: true
+      className: nginx
+      hosts:
+        - host: staging.dacn.local
+          paths:
+            - path: /
+              pathType: Prefix
+              serviceName: frontend
+              servicePort: 80
+            - path: /api
+              pathType: Prefix
+              serviceName: gateway
+              servicePort: 3000
+    infrastructure:
+      mongodb:
+        enabled: false
+      redis:
+        enabled: false
+      rabbitmq:
+        enabled: false
