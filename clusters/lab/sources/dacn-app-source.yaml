@@ -7,4 +7,4 @@ spec:
   interval: 1m
   ref:
     branch: main
-  url: https://github.com/catarena2608/dacn-app.git
+  url: https://github.com/catarena2608/DACN.git
