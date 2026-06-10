@@ -20,6 +20,12 @@ spec:
     remediation:
       retries: 3
   values:
+    global:
+      security:
+        allowInsecureImages: true
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/rabbitmq
     auth:
       username: dacn
       password: dacn-lab-password
