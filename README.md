@@ -1,6 +1,6 @@
 # dacn-gitops
 
-Repository GitOps tương lai cho đồ án DACN.
+Repository GitOps cho đồ án DACN.
 
 Repo này chỉ mô tả **desired state của cluster**: namespace, ingress, database, observability, secret reference, HelmRelease/Kustomization và cấu hình triển khai ứng dụng theo môi trường.
 
@@ -35,6 +35,14 @@ dacn-gitops/
 │       ├── kustomization.yaml
 │       ├── namespaces.yaml
 │       └── minikube-system-build-plan.md
+├── docs/
+│   └── automation-guide.md
+├── scripts/
+│   ├── bootstrap-minikube.sh
+│   ├── promote-production.sh
+│   ├── set-image-tag.sh
+│   ├── smoke-test.sh
+│   └── validate-gitops.sh
 └── secrets/
     ├── production/
     └── staging/
@@ -46,6 +54,21 @@ Xem tài liệu chính tại:
 
 - [clusters/lab/minikube-system-build-plan.md](clusters/lab/minikube-system-build-plan.md)
 - [clusters/lab/minikube-deployment-runbook.md](clusters/lab/minikube-deployment-runbook.md)
+- [docs/automation-guide.md](docs/automation-guide.md)
+
+## Script tự động hóa
+
+Các script vận hành Minikube/GitOps nằm trong:
+
+```text
+scripts/
+```
+
+Luồng CI tự cập nhật staging image tag được mô tả trong:
+
+```text
+docs/automation-guide.md
+```
 
 ## Nguyên tắc
 

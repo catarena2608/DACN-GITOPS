@@ -2,6 +2,12 @@
 
 Runbook này mô tả kịch bản triển khai hệ thống DACN trên Minikube để mô phỏng một Kubernetes cluster. Mục tiêu là chứng minh luồng GitOps từ image đã build tới staging, validation, rồi promote sang production-like namespace.
 
+Script tự động hóa và cấu hình GitHub Actions được mô tả chi tiết hơn tại:
+
+```text
+docs/automation-guide.md
+```
+
 ## 1. Giả Định Ban Đầu
 
 - Source app nằm trong repo `dacn-app` hoặc `My_DACN`.
@@ -208,10 +214,16 @@ Thêm vào hosts file của máy:
 <minikube-ip> prod.dacn.local
 ```
 
-Trên Windows, hosts file nằm tại:
+Trên Ubuntu, hosts file nằm tại:
 
 ```text
-C:\Windows\System32\drivers\etc\hosts
+/etc/hosts
+```
+
+Ví dụ:
+
+```bash
+sudo sh -c 'echo "<minikube-ip> staging.dacn.local prod.dacn.local" >> /etc/hosts'
 ```
 
 ## 9. Smoke Test Staging
