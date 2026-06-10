@@ -31,7 +31,7 @@ spec:
     global:
       environment: staging
       domain: staging.dacn.local
-      imageTag: latest
+      imageTag: sha-b9c8cb4
     services:
       auth:
         replicaCount: 1
