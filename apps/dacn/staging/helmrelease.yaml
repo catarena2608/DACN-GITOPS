@@ -31,7 +31,9 @@ spec:
     global:
       environment: staging
       domain: staging.dacn.local
-      imageTag: sha-b9c8cb4
+      imageTag: sha-60d4d0e
+      imagePullSecrets:
+        - name: ghcr-pull-secret
     services:
       auth:
         replicaCount: 1
