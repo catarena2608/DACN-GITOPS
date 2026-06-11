@@ -27,6 +27,8 @@ spec:
     prometheus:
       prometheusSpec:
         retention: 2d
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
         resources:
           requests:
             cpu: 200m
