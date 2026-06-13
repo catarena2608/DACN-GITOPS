@@ -5,6 +5,7 @@ metadata:
   namespace: dacn-staging
 spec:
   interval: 5m
+  timeout: 15m
   releaseName: dacn-staging
   targetNamespace: dacn-staging
   dependsOn:
@@ -27,6 +28,7 @@ spec:
   upgrade:
     remediation:
       retries: 3
+      strategy: uninstall
   values:
     global:
       environment: staging
