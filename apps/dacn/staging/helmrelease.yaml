@@ -31,7 +31,7 @@ spec:
     global:
       environment: staging
       domain: staging.dacn.local
-      imageTag: sha-60d4d0e
+      imageTag: sha-b9c8cb4
       imagePullSecrets:
         - name: ghcr-pull-secret
     services:
@@ -102,6 +102,8 @@ spec:
     ingress:
       enabled: true
       className: traefik
+      annotations:
+        kubernetes.io/ingress.class: traefik
       hosts:
         - host: staging.dacn.local
           paths:

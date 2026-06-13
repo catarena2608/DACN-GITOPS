@@ -23,7 +23,8 @@ data:
       debug:
         verbosity: basic
       elasticsearch:
-        endpoint: http://elasticsearch.observability.svc.cluster.local:9200
+        endpoints:
+          - http://elasticsearch.observability.svc.cluster.local:9200
         logs_index: dacn-otel-logs
         traces_index: dacn-otel-traces
 

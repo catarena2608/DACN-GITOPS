@@ -101,6 +101,8 @@ spec:
     ingress:
       enabled: true
       className: traefik
+      annotations:
+        kubernetes.io/ingress.class: traefik
       hosts:
         - host: prod.dacn.local
           paths:
