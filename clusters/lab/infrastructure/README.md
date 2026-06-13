@@ -8,4 +8,5 @@ observability/
 data/
 ```
 
-Trong Minikube lab, `ingress-nginx` được bật bằng Minikube addon. Data layer và observability được quản lý bằng FluxCD HelmRelease.
+In the Minikube lab, `ingress-nginx` is enabled through the Minikube addon. The data layer and observability components are managed by FluxCD HelmRelease resources.
+

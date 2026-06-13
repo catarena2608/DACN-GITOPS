@@ -1,28 +1,28 @@
 # Lab Cluster
 
-Thư mục này mô tả trạng thái mong muốn của cluster lab chạy bằng Minikube.
+This directory describes the desired state for the Minikube lab cluster.
 
-Cluster lab dùng để chứng minh toàn bộ workflow:
+The lab cluster demonstrates the full workflow:
 
-- Tạo Kubernetes cluster bằng Minikube.
-- Cài FluxCD.
-- Cài ingress, data layer và observability.
-- Deploy staging bằng GitOps.
-- Chạy kiểm thử hiệu năng.
-- Promote sang production-like environment bằng thay đổi Git.
+- Create a Kubernetes cluster with Minikube.
+- Install FluxCD.
+- Install ingress, data layer, and observability components.
+- Deploy staging through GitOps.
+- Run performance validation.
+- Promote to the production-like environment through a Git change.
 
-Plan chi tiết:
+Detailed plans:
 
 - [minikube-system-build-plan.md](minikube-system-build-plan.md)
 - [minikube-deployment-runbook.md](minikube-deployment-runbook.md)
 
-Entrypoint GitOps:
+GitOps entry point:
 
 ```text
 clusters/lab/kustomization.yaml
 ```
 
-Resource chính hiện có:
+Main resources:
 
 ```text
 namespaces.yaml
@@ -31,3 +31,4 @@ infrastructure/data/
 infrastructure/observability/
 apps/
 ```
+

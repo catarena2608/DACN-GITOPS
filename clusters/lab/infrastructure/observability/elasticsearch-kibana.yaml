@@ -134,9 +134,9 @@ metadata:
   name: kibana
   namespace: observability
   annotations:
-    kubernetes.io/ingress.class: nginx
+    kubernetes.io/ingress.class: traefik
 spec:
-  ingressClassName: nginx
+  ingressClassName: traefik
   rules:
     - host: kibana.dacn.local
       http:

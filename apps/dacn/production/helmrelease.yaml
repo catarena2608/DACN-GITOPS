@@ -100,7 +100,7 @@ spec:
           enabled: false
     ingress:
       enabled: true
-      className: nginx
+      className: traefik
       hosts:
         - host: prod.dacn.local
           paths:

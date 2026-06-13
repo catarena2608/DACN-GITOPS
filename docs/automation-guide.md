@@ -1,26 +1,26 @@
 # Automation Guide
 
-Tài liệu này mô tả cách tự động hóa triển khai hệ thống DACN trên Minikube lab bằng GitHub Actions và FluxCD.
+This document explains how to automate DACN deployment on the Minikube lab with GitHub Actions and FluxCD.
 
-## 1. Mục Tiêu Tự Động Hóa
+## 1. Automation Goal
 
-Luồng mong muốn:
+Target flow:
 
 ```text
-Developer push code vào repo app
+Developer pushes code to the app repository
 -> GitHub Actions build/test/security/smoke
--> build và push image GHCR tag sha-xxxxxxx
--> GitHub Actions cập nhật imageTag staging trong dacn-gitops
--> FluxCD reconcile staging trên Minikube
--> chạy smoke/load validation
--> nếu pass thì promote cùng image tag sang production-like
+-> build and push GHCR images tagged sha-xxxxxxx
+-> GitHub Actions updates the staging imageTag in dacn-gitops
+-> FluxCD reconciles staging on Minikube
+-> smoke/load validation runs
+-> if validation passes, promote the same image tag to production-like
 ```
 
-GitHub Actions không chạy `kubectl apply` vào cluster. Actions chỉ cập nhật Git. FluxCD là thành phần duy nhất reconcile cluster từ Git state.
+GitHub Actions does not run `kubectl apply` against the cluster. Actions only updates Git. FluxCD is the only component that reconciles the cluster from Git state.
 
-## 2. Scripts Hiện Có
+## 2. Existing Scripts
 
-Trong repo `dacn-gitops`:
+In the `dacn-gitops` repository:
 
 ```text
 scripts/bootstrap-minikube.sh
@@ -30,23 +30,23 @@ scripts/promote-production.sh
 scripts/smoke-test.sh
 ```
 
-Trong repo app `My_DACN`:
+In the app repository:
 
 ```text
 scripts/update-gitops-staging.sh
 ```
 
-Script `update-gitops-staging.sh` được dùng bởi workflow `ci-main.yml` để sửa `apps/dacn/staging/helmrelease.yaml` trong repo GitOps.
+`update-gitops-staging.sh` is used by `ci-main.yml` to update `apps/dacn/staging/helmrelease.yaml` in the GitOps repository.
 
-## 3. Chuẩn Bị GitHub Secrets Và Variables
+## 3. GitHub Secrets And Variables
 
-Trong repo app `My_DACN`, cấu hình:
+In the app repository, configure:
 
 ```text
 Settings -> Secrets and variables -> Actions
 ```
 
-Secrets cần có:
+Required secrets:
 
 ```text
 GITOPS_TOKEN
@@ -56,28 +56,28 @@ ORDER_ENV_DEV
 GATEWAY_ENV_DEV
 ```
 
-`GITOPS_TOKEN` là fine-grained personal access token có quyền:
+`GITOPS_TOKEN` should be a fine-grained personal access token with:
 
 ```text
 Repository: dacn-gitops
 Permission: Contents read/write
 ```
 
-Variables nên có:
+Recommended variable:
 
 ```text
 GITOPS_REPOSITORY=<owner>/dacn-gitops
 ```
 
-Nếu không đặt `GITOPS_REPOSITORY`, workflow sẽ mặc định dùng:
+If `GITOPS_REPOSITORY` is not set, the workflow defaults to:
 
 ```text
 <github.repository_owner>/dacn-gitops
 ```
 
-## 4. Bootstrap Minikube Và FluxCD
+## 4. Bootstrap Minikube And FluxCD
 
-Chạy từ thư mục `dacn-gitops`:
+Run from the `dacn-gitops` directory:
 
 ```bash
 GITHUB_OWNER="<github-user-or-org>" \
@@ -85,24 +85,24 @@ GITOPS_REPOSITORY="dacn-gitops" \
 scripts/bootstrap-minikube.sh
 ```
 
-Script sẽ:
+The script:
 
 ```text
-start Minikube profile dacn-lab
-enable metrics-server
-enable ingress
-enable storage-provisioner
-enable default-storageclass
-flux bootstrap github --path clusters/lab
+starts Minikube profile dacn-lab
+enables metrics-server
+enables ingress
+enables storage-provisioner
+enables default-storageclass
+runs flux bootstrap github --path clusters/lab
 ```
 
-Nếu chỉ muốn tạo Minikube, chưa bootstrap Flux:
+To create Minikube without bootstrapping Flux:
 
 ```bash
 SKIP_FLUX_BOOTSTRAP=true scripts/bootstrap-minikube.sh
 ```
 
-## 5. Validate GitOps Local
+## 5. Validate GitOps Locally
 
 Render Kustomize:
 
@@ -110,13 +110,13 @@ Render Kustomize:
 scripts/validate-gitops.sh
 ```
 
-Kiểm tra cả cluster/Flux:
+Check cluster and Flux state:
 
 ```bash
 CHECK_CLUSTER=true scripts/validate-gitops.sh
 ```
 
-Lệnh này tương đương kiểm tra:
+This is equivalent to checking:
 
 ```text
 kubectl kustomize clusters/lab
@@ -126,54 +126,54 @@ flux get helmreleases
 kubectl get pods -A
 ```
 
-## 6. CI Tự Cập Nhật Staging
+## 6. CI Updates Staging Automatically
 
-Workflow `My_DACN/.github/workflows/ci-main.yml` đã có job:
+Workflow `ci-main.yml` contains:
 
 ```text
 update-gitops-staging
 ```
 
-Job này chỉ chạy khi push vào `main`.
+The job runs only on push to `main`.
 
-Sau khi tất cả image đã push lên GHCR, job sẽ:
+After all images are pushed to GHCR, the job:
 
 ```text
-compute image tag sha-xxxxxxx
-checkout repo app
-checkout repo dacn-gitops bằng GITOPS_TOKEN
-chạy scripts/update-gitops-staging.sh
-commit thay đổi imageTag vào dacn-gitops
-push lên main của dacn-gitops
+computes image tag sha-xxxxxxx
+checks out the app repository
+checks out dacn-gitops with GITOPS_TOKEN
+runs scripts/update-gitops-staging.sh
+commits the new imageTag into dacn-gitops
+pushes to main of dacn-gitops
 ```
 
-FluxCD đang chạy trong Minikube sẽ phát hiện commit mới và deploy staging.
+FluxCD running in Minikube detects the commit and deploys staging.
 
-## 7. Set Image Tag Thủ Công Khi Cần
+## 7. Set Image Tag Manually
 
-Nếu muốn cập nhật staging thủ công:
+Update staging:
 
 ```bash
 scripts/set-image-tag.sh staging sha-xxxxxxx
 ```
 
-Nếu muốn cập nhật production-like thủ công:
+Update production-like:
 
 ```bash
 scripts/set-image-tag.sh production sha-xxxxxxx
 ```
 
-Sau khi sửa, commit và push repo `dacn-gitops` để FluxCD reconcile.
+After changing the file, commit and push the GitOps repository so FluxCD can reconcile.
 
 ## 8. Smoke Test Staging
 
-Sau khi staging deploy xong:
+After staging deploys:
 
 ```bash
 scripts/smoke-test.sh http://staging.dacn.local
 ```
 
-Kiểm tra production-like:
+Production-like:
 
 ```bash
 scripts/smoke-test.sh http://prod.dacn.local
@@ -181,49 +181,52 @@ scripts/smoke-test.sh http://prod.dacn.local
 
 ## 9. Promote Production-Like
 
-Sau khi staging validation pass:
+After staging validation passes:
 
 ```bash
 scripts/promote-production.sh
 ```
 
-Script sẽ:
+The script:
 
 ```text
-đọc imageTag hiện tại của staging
-ghi imageTag đó sang production
-đổi production HelmRelease từ suspend: true thành suspend: false
+reads the current staging imageTag
+writes that imageTag to production
+changes production HelmRelease from suspend: true to suspend: false
 ```
 
-Cũng có thể chỉ định tag:
+Specify a tag explicitly:
 
 ```bash
 scripts/promote-production.sh sha-xxxxxxx
 ```
 
-Sau đó tạo PR hoặc commit/push vào repo `dacn-gitops`. Khi thay đổi được merge, FluxCD deploy production-like.
+Commit or open a PR with the change. Once merged, FluxCD deploys production-like.
 
 ## 10. Rollback
 
-Rollback bằng Git:
+Rollback through Git:
 
 ```text
-revert commit cập nhật imageTag
-hoặc set imageTag về sha đã pass trước đó
+revert the imageTag update commit
+or set imageTag back to a known-good sha
 ```
 
-Ví dụ:
+Example:
 
 ```bash
 scripts/set-image-tag.sh staging sha-oldgood
 ```
 
-Sau khi push, FluxCD sẽ reconcile lại cluster.
+After pushing, FluxCD reconciles the cluster back to the desired state.
 
-## 11. Giới Hạn Hiện Tại
+## 11. Current Limitations
 
-- Staging validation vẫn có thể chạy thủ công bằng workflow `staging-validation.yml`.
-- Production-like promotion nên đi qua PR để có review.
-- Secret trong repo hiện là placeholder cho lab, chưa phải SOPS/Sealed Secrets.
-- ELK, OpenTelemetry và Jaeger chưa được tự động triển khai trong phase này.
-- Nếu GHCR package private, cần tạo image pull secret trong `dacn-staging` và `dacn-prod`.
+```text
+Staging validation can still be run manually with staging-validation.yml.
+Production-like promotion should go through PR review.
+Secrets in this repository are lab placeholders, not SOPS/Sealed Secrets yet.
+OpenTelemetry instrumentation in the application is still required for real traces.
+If GHCR packages are private, create imagePullSecrets in dacn-staging and dacn-prod.
+```
+

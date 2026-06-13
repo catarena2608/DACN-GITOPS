@@ -1,20 +1,20 @@
 # dacn-gitops
 
-Repository GitOps cho đồ án DACN.
+GitOps repository for the DACN project.
 
-Repo này chỉ mô tả **desired state của cluster**: namespace, ingress, database, observability, secret reference, HelmRelease/Kustomization và cấu hình triển khai ứng dụng theo môi trường.
+This repository describes only the **desired cluster state**: namespaces, ingress, data layer, observability, secret references, HelmRelease/Kustomization resources, and environment-specific deployment configuration.
 
-Source code, Dockerfile, Helm chart gốc, test script và tài liệu kỹ thuật vẫn nằm ở repo app hiện tại. Trong workspace này repo app đang là `My_DACN`; khi hoàn thiện có thể đổi tên thư mục thành `dacn-app`.
+Application source code, Dockerfiles, the base Helm chart, test scripts, and technical documentation live in the app repository.
 
-## Mục tiêu
+## Goals
 
-- Dùng FluxCD làm CD controller.
-- Dùng Git làm nguồn sự thật cho trạng thái cluster.
-- Tách rõ cấu hình `staging` và `production`.
-- Không commit secret thật lên GitHub.
-- Cho phép dựng lab bằng Minikube nhưng vẫn giữ tư duy gần với production.
+- Use FluxCD as the CD controller.
+- Use Git as the source of truth for cluster state.
+- Keep `staging` and `production` configuration clearly separated.
+- Do not commit real secrets to GitHub.
+- Support a Minikube lab while keeping a production-like operating model.
 
-## Cấu trúc hiện tại
+## Current Structure
 
 ```text
 dacn-gitops/
@@ -48,32 +48,33 @@ dacn-gitops/
     └── staging/
 ```
 
-## Kế hoạch triển khai lab
+## Lab Deployment Plan
 
-Xem tài liệu chính tại:
+Main documentation:
 
 - [clusters/lab/minikube-system-build-plan.md](clusters/lab/minikube-system-build-plan.md)
 - [clusters/lab/minikube-deployment-runbook.md](clusters/lab/minikube-deployment-runbook.md)
 - [docs/automation-guide.md](docs/automation-guide.md)
 
-## Script tự động hóa
+## Automation Scripts
 
-Các script vận hành Minikube/GitOps nằm trong:
+Operational Minikube/GitOps scripts live in:
 
 ```text
 scripts/
 ```
 
-Luồng CI tự cập nhật staging image tag được mô tả trong:
+The CI flow that updates the staging image tag is described in:
 
 ```text
 docs/automation-guide.md
 ```
 
-## Nguyên tắc
+## Principles
 
-- GitHub Actions chỉ build/test/push image ở repo app.
-- FluxCD đọc repo này và tự đồng bộ cluster.
-- Image tag phải là tag bất biến, ví dụ `sha-<commit>`, không dùng `latest` cho staging/production.
-- Secret thật được quản lý bằng External Secrets, Sealed Secrets hoặc SOPS; thư mục `secrets/` chỉ chứa template hoặc encrypted manifest.
-- Mọi thay đổi lên production nên đi qua pull request để có lịch sử kiểm soát.
+- GitHub Actions builds, tests, and pushes images in the app repository.
+- FluxCD reads this repository and reconciles the cluster.
+- Staging and production should use immutable image tags such as `sha-<commit>`, not `latest`.
+- Real secrets should be managed with External Secrets, Sealed Secrets, or SOPS. The `secrets/` directory should contain templates or encrypted manifests only.
+- Production changes should go through pull requests so the promotion history remains auditable.
+

@@ -101,7 +101,7 @@ spec:
           enabled: false
     ingress:
       enabled: true
-      className: nginx
+      className: traefik
       hosts:
         - host: staging.dacn.local
           paths:

@@ -2,7 +2,7 @@
 
 Desired state for lab MongoDB, Redis, and RabbitMQ.
 
-Các resource hiện tại dùng Bitnami Helm chart:
+The current resources use Bitnami Helm charts:
 
 ```text
 mongodb.yaml
@@ -10,4 +10,5 @@ redis.yaml
 rabbitmq.yaml
 ```
 
-Thiết kế này phục vụ Minikube lab. Production thật nên thay bằng managed database/cache/broker hoặc chart có HA, backup và secret management nghiêm túc hơn.
+This design is intended for the Minikube lab. A real production environment should use managed database/cache/broker services, or HA charts with backup and serious secret management.
+

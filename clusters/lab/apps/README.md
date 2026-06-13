@@ -2,11 +2,12 @@
 
 Cluster entry points for applications managed by FluxCD.
 
-File `kustomization.yaml` trỏ tới:
+`kustomization.yaml` points to:
 
 ```text
 apps/dacn/staging
 apps/dacn/production
 ```
 
-Staging được deploy mặc định. Production-like đã có resource nhưng `HelmRelease` đang `suspend: true` để chỉ bật sau khi staging validation pass.
+Staging is deployed by default. The production-like resource exists, but its `HelmRelease` is `suspend: true` and should only be enabled after staging validation passes.
+
