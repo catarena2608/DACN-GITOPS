@@ -43,6 +43,8 @@ spec:
           REDIS_URL: redis://redis-master.data.svc.cluster.local:6379
           JWT_EXPIRES_IN: 15m
           JWT_REFRESH_EXPIRES_IN: 7d
+          SERVICE_NAME: auth-service
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
         envFromSecrets:
           - dacn-auth-prod-secrets
         autoscaling:
@@ -57,6 +59,8 @@ spec:
           PORT: "3002"
           REDIS_URL: redis://redis-master.data.svc.cluster.local:6379
           RABBITMQ_URL: amqp://dacn:dacn-lab-password@rabbitmq.data.svc.cluster.local:5672
+          SERVICE_NAME: product-service
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
         envFromSecrets:
           - dacn-product-prod-secrets
         autoscaling:
@@ -71,6 +75,8 @@ spec:
           PORT: "3003"
           REDIS_URL: redis://redis-master.data.svc.cluster.local:6379
           RABBITMQ_URL: amqp://dacn:dacn-lab-password@rabbitmq.data.svc.cluster.local:5672
+          SERVICE_NAME: order-service
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
         envFromSecrets:
           - dacn-order-prod-secrets
         autoscaling:

@@ -25,11 +25,17 @@ spec:
               value: http://elasticsearch.observability.svc.cluster.local:9200
             - name: ES_TAGS_AS_FIELDS_ALL
               value: "true"
+            - name: COLLECTOR_OTLP_ENABLED
+              value: "true"
           ports:
             - name: query
               containerPort: 16686
             - name: admin
               containerPort: 14269
+            - name: otlp-grpc
+              containerPort: 4317
+            - name: otlp-http
+              containerPort: 4318
           resources:
             requests:
               cpu: 100m
@@ -53,6 +59,12 @@ spec:
     - name: http-query
       port: 16686
       targetPort: query
+    - name: otlp-grpc
+      port: 4317
+      targetPort: otlp-grpc
+    - name: otlp-http
+      port: 4318
+      targetPort: otlp-http
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

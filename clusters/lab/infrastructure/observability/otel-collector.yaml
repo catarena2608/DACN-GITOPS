@@ -27,13 +27,17 @@ data:
           - http://elasticsearch.observability.svc.cluster.local:9200
         logs_index: dacn-otel-logs
         traces_index: dacn-otel-traces
+      otlp/jaeger:
+        endpoint: jaeger-query.observability.svc.cluster.local:4317
+        tls:
+          insecure: true
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [elasticsearch, debug]
+          exporters: [elasticsearch, otlp/jaeger, debug]
         logs:
           receivers: [otlp]
           processors: [memory_limiter, batch]
