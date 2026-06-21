@@ -67,7 +67,7 @@ spec:
           - dacn-product-staging-secrets
         autoscaling:
           enabled: true
-          minReplicas: 1
+          minReplicas: 3
           maxReplicas: 3
           targetCPUUtilizationPercentage: 70
       order:
@@ -99,11 +99,14 @@ spec:
         healthCheck:
           path: /
           port: 3000
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 12
         envFromSecrets:
           - dacn-gateway-staging-secrets
         autoscaling:
           enabled: true
-          minReplicas: 1
+          minReplicas: 3
           maxReplicas: 3
           targetCPUUtilizationPercentage: 70
       frontend:
