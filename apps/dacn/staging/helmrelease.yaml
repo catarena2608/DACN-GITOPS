@@ -33,7 +33,7 @@ spec:
     global:
       environment: staging
       domain: staging.dacn.local
-      imageTag: sha-9408845
+      imageTag: sha-ae0d97e
       imagePullSecrets:
         - name: ghcr-pull-secret
     services:
