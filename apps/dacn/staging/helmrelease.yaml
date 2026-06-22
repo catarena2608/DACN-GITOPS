@@ -68,7 +68,7 @@ spec:
         autoscaling:
           enabled: true
           minReplicas: 3
-          maxReplicas: 3
+          maxReplicas: 6
           targetCPUUtilizationPercentage: 70
       order:
         replicaCount: 1
@@ -121,7 +121,7 @@ spec:
         autoscaling:
           enabled: true
           minReplicas: 3
-          maxReplicas: 3
+          maxReplicas: 6
           targetCPUUtilizationPercentage: 70
       frontend:
         replicaCount: 1
