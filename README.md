@@ -4,6 +4,28 @@ GitOps repository for the DACN project.
 
 This repository describes only the **desired cluster state**: namespaces, ingress, data layer, observability, secret references, HelmRelease/Kustomization resources, and environment-specific deployment configuration.
 
+Production promotion belongs to the CD/GitOps flow. The administrator runs `scripts/promote-production.sh` locally, reviews the Git diff, then commits and pushes the GitOps change. FluxCD performs the actual Kubernetes reconciliation after the GitOps repository is updated.
+
+```bash
+scripts/promote-production.sh
+git diff apps/dacn/production/helmrelease.yaml
+git add apps/dacn/production/helmrelease.yaml
+git commit -m "chore: promote staging image to production"
+git push
+```
+
+By default, the script uses the newest quality gate summary from `../DACN/reports/production-gate`. To use a specific summary:
+
+```bash
+scripts/promote-production.sh --gate-summary ../DACN/reports/production-gate/<run-id>/production-readiness-summary.md
+```
+
+To promote a specific immutable tag instead of the current staging tag:
+
+```bash
+scripts/promote-production.sh sha-abc1234
+```
+
 Application source code, Dockerfiles, the base Helm chart, test scripts, and technical documentation live in the app repository.
 
 ## Goals
