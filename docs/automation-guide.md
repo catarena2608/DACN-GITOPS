@@ -223,10 +223,9 @@ After pushing, FluxCD reconciles the cluster back to the desired state.
 ## 11. Current Limitations
 
 ```text
-Staging validation can still be run manually with staging-validation.yml.
+Staging validation belongs to the CD/staging gate after FluxCD reconciles the requested image tag.
 Production-like promotion should go through PR review.
 Secrets in this repository are lab placeholders, not SOPS/Sealed Secrets yet.
 OpenTelemetry instrumentation in the application is still required for real traces.
 If GHCR packages are private, create imagePullSecrets in dacn-staging and dacn-prod.
 ```
-

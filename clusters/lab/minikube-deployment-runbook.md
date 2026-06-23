@@ -227,12 +227,17 @@ kubectl -n dacn-staging logs deploy/dacn-staging-order
 
 ## 10. Load Test And Validation
 
-Run `staging-validation.yml` in the app repository with:
+Run the staging gate after FluxCD has reconciled the requested image tag:
 
-```text
-image_tag=sha-xxxxxxx
-staging_url=http://staging.dacn.local
-run_10k_load_test=false
+```bash
+cd <application-repository>
+export KUBECONFIG=<path-to-kubeconfig>
+export EXPECTED_IMAGE_TAG=sha-xxxxxxx
+export STAGING_URL=http://staging.dacn.local
+export SEED_EMAIL=<staging-test-user>
+export SEED_PASSWORD=<staging-test-password>
+
+scripts/production-readiness-gate.sh
 ```
 
 For local Minikube, do not start with 10,000 VUs. Begin with a smaller baseline and increase load gradually. For a real 10,000-VU test, use k6 Cloud or distributed runners.
@@ -292,4 +297,3 @@ Include:
 - k6 baseline/load test results.
 - Staging and production-like image tag table.
 - GitOps rollback explanation.
-

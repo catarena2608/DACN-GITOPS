@@ -29,7 +29,7 @@ dacn-gitops/
 │       ├── flux-system/
 │       ├── infrastructure/
 │       │   ├── data/
-│       │   ├── ingress-nginx/
+│       │   ├── ingress-nginx/        # optional Minikube ingress notes
 │       │   └── observability/
 │       ├── sources/
 │       ├── kustomization.yaml
@@ -47,6 +47,8 @@ dacn-gitops/
     ├── production/
     └── staging/
 ```
+
+The project depends on Kubernetes Ingress, not on a specific controller. In the current lab, `ingressClassName` selects the available controller for that cluster.
 
 ## Lab Deployment Plan
 
@@ -77,4 +79,3 @@ docs/automation-guide.md
 - Staging and production should use immutable image tags such as `sha-<commit>`, not `latest`.
 - Real secrets should be managed with External Secrets, Sealed Secrets, or SOPS. The `secrets/` directory should contain templates or encrypted manifests only.
 - Production changes should go through pull requests so the promotion history remains auditable.
-

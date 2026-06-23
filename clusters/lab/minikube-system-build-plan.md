@@ -30,7 +30,7 @@ The main goal is not only to run the application, but to build a complete enough
 | Cluster | Minikube | Kubernetes lab cluster |
 | CD/GitOps | FluxCD | Reconcile cluster from Git |
 | Package | Helm | Package application and infrastructure |
-| Routing | NGINX Ingress Controller | Expose gateway/frontend |
+| Routing | Kubernetes Ingress + available controller | Expose gateway/frontend |
 | Data | MongoDB, Redis, RabbitMQ | Database, cache, message broker |
 | Metrics | Prometheus, Grafana | Collect and visualize metrics |
 | Logs | OpenTelemetry Collector, Elasticsearch, Kibana | Collect, store, search, and analyze logs |
@@ -74,7 +74,7 @@ minikube addons enable default-storageclass -p dacn-lab
 
 ```text
 flux-system
-ingress-nginx
+ingress-nginx or controller-specific namespace
 observability
 data
 dacn-staging
@@ -84,7 +84,7 @@ dacn-prod
 Meaning:
 
 - `flux-system`: FluxCD controllers.
-- `ingress-nginx`: Ingress controller.
+- `ingress-nginx` or controller-specific namespace: Ingress controller.
 - `observability`: Prometheus, Grafana, Elasticsearch, Kibana, OTel Collector, Jaeger.
 - `data`: MongoDB, Redis, RabbitMQ.
 - `dacn-staging`: staging environment.
@@ -144,7 +144,7 @@ Goal: create a working cluster and GitOps loop.
 Deploy:
 
 - Minikube cluster.
-- NGINX Ingress Controller.
+- Ingress Controller.
 - FluxCD.
 - Standard namespaces.
 - Default StorageClass.
@@ -413,4 +413,3 @@ More accurate statements:
 - The lab demonstrates observability through metrics, logs, and traces.
 - Load tests help identify bottlenecks and estimate capacity.
 - Real production still needs HA, backup, disaster recovery, autoscaling, security hardening, and dedicated infrastructure sizing.
-
