@@ -65,7 +65,6 @@ minikube start \
 ```bash
 kubectl config use-context dacn-lab
 minikube addons enable metrics-server -p dacn-lab
-minikube addons enable ingress -p dacn-lab
 minikube addons enable storage-provisioner -p dacn-lab
 minikube addons enable default-storageclass -p dacn-lab
 ```
@@ -74,7 +73,7 @@ minikube addons enable default-storageclass -p dacn-lab
 
 ```text
 flux-system
-ingress-nginx or controller-specific namespace
+ingress-system
 observability
 data
 dacn-staging
@@ -84,7 +83,7 @@ dacn-prod
 Meaning:
 
 - `flux-system`: FluxCD controllers.
-- `ingress-nginx` or controller-specific namespace: Ingress controller.
+- `ingress-system`: Traefik Ingress Controller managed by FluxCD.
 - `observability`: Prometheus, Grafana, Elasticsearch, Kibana, OTel Collector, Jaeger.
 - `data`: MongoDB, Redis, RabbitMQ.
 - `dacn-staging`: staging environment.
@@ -120,7 +119,7 @@ dacn-gitops/
 │       ├── flux-system/
 │       └── infrastructure/
 │           ├── data/
-│           ├── ingress-nginx/
+│           ├── ingress/
 │           └── observability/
 └── secrets/
     ├── staging/

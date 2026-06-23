@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - namespaces.yaml
   - sources
-  - infrastructure
-  - apps
+  - kustomizations.yaml

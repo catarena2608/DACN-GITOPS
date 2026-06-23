@@ -31,11 +31,12 @@ Enable required addons:
 
 ```bash
 minikube addons enable metrics-server -p dacn-lab
-minikube addons enable ingress -p dacn-lab
 minikube addons enable storage-provisioner -p dacn-lab
 minikube addons enable default-storageclass -p dacn-lab
 kubectl config use-context dacn-lab
 ```
+
+Traefik is installed later by FluxCD from `clusters/lab/infrastructure/ingress`.
 
 Check:
 

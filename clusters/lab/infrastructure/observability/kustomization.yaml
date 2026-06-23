@@ -2,7 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - prometheus-stack.yaml
-  - dacn-alert-rules.yaml
   - otel-collector.yaml
   - jaeger.yaml
   - elasticsearch-kibana.yaml

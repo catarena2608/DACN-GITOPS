@@ -51,9 +51,10 @@ dacn-gitops/
 │       ├── flux-system/
 │       ├── infrastructure/
 │       │   ├── data/
-│       │   ├── ingress-nginx/        # optional Minikube ingress notes
+│       │   ├── ingress/
 │       │   └── observability/
 │       ├── sources/
+│       ├── kustomizations.yaml
 │       ├── kustomization.yaml
 │       ├── namespaces.yaml
 │       └── minikube-system-build-plan.md
@@ -70,7 +71,7 @@ dacn-gitops/
     └── staging/
 ```
 
-The project depends on Kubernetes Ingress, not on a specific controller. In the current lab, `ingressClassName` selects the available controller for that cluster.
+The lab cluster installs Traefik through FluxCD and uses the `traefik` IngressClass for application and observability ingress resources.
 
 ## Lab Deployment Plan
 

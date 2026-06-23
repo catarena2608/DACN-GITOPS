@@ -6,7 +6,7 @@ The lab cluster demonstrates the full workflow:
 
 - Create a Kubernetes cluster with Minikube.
 - Install FluxCD.
-- Install ingress, data layer, and observability components.
+- Install Traefik, data layer, and observability components.
 - Deploy staging through GitOps.
 - Run performance validation.
 - Promote to the production-like environment through a Git change.
@@ -27,8 +27,11 @@ Main resources:
 ```text
 namespaces.yaml
 sources/
+kustomizations.yaml
 infrastructure/data/
+infrastructure/ingress/
 infrastructure/observability/
 apps/
 ```
 
+`kustomizations.yaml` splits reconciliation into phases. Alert rules are applied after kube-prometheus-stack is ready so the `PrometheusRule` CRD already exists.

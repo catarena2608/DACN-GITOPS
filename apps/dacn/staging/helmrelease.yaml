@@ -9,6 +9,8 @@ spec:
   releaseName: dacn-staging
   targetNamespace: dacn-staging
   dependsOn:
+    - name: traefik
+      namespace: ingress-system
     - name: mongodb
       namespace: data
     - name: redis

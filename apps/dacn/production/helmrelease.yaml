@@ -10,6 +10,8 @@ spec:
   releaseName: dacn-prod
   targetNamespace: dacn-prod
   dependsOn:
+    - name: traefik
+      namespace: ingress-system
     - name: mongodb
       namespace: data
     - name: redis

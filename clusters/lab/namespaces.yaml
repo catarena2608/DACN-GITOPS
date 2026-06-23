@@ -6,7 +6,7 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ingress-nginx
+  name: ingress-system
 ---
 apiVersion: v1
 kind: Namespace
