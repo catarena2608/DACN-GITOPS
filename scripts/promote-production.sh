@@ -3,19 +3,23 @@ set -euo pipefail
 
 IMAGE_TAG=""
 QUALITY_GATE_SUMMARY="${QUALITY_GATE_SUMMARY:-}"
+DEMO_ALLOW_FAILED_GATE="${DEMO_ALLOW_FAILED_GATE:-false}"
 
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/promote-production.sh [--gate-summary <summary-file>] [image-tag]
+  scripts/promote-production.sh [--gate-summary <summary-file>] [--demo-allow-failed-gate] [image-tag]
 
 If image-tag is omitted, the script copies the current staging imageTag.
 If --gate-summary is omitted, the script uses the newest
 ../DACN/reports/production-gate/*/production-readiness-summary.md file.
 The summary must be generated for the same image tag.
 
+--demo-allow-failed-gate bypasses quality-gate status checks for a lab demo.
+
 Environment:
   QUALITY_GATE_SUMMARY can be used instead of --gate-summary.
+  DEMO_ALLOW_FAILED_GATE=true is equivalent to --demo-allow-failed-gate.
 EOF
 }
 
@@ -32,6 +36,10 @@ while [[ "$#" -gt 0 ]]; do
       fi
       QUALITY_GATE_SUMMARY="$2"
       shift 2
+      ;;
+    --demo-allow-failed-gate)
+      DEMO_ALLOW_FAILED_GATE=true
+      shift
       ;;
     *)
       if [[ -n "$IMAGE_TAG" ]]; then
@@ -93,34 +101,38 @@ echo "Using quality gate summary: $QUALITY_GATE_SUMMARY"
 
 SUMMARY_TAG="$(awk -F': ' '/^- Expected image tag:/ { print $2; exit }' "$QUALITY_GATE_SUMMARY" | tr -d '\r')"
 
-if [[ "$SUMMARY_TAG" != "$IMAGE_TAG" ]]; then
-  echo "Quality gate tag does not match production promotion tag." >&2
-  echo "  gate summary tag: ${SUMMARY_TAG:-not found}" >&2
-  echo "  promote tag:      $IMAGE_TAG" >&2
-  exit 1
-fi
+if [[ "$DEMO_ALLOW_FAILED_GATE" == "true" ]]; then
+  echo "WARNING: demo override enabled; quality-gate status checks are bypassed." >&2
+else
+  if [[ "$SUMMARY_TAG" != "$IMAGE_TAG" ]]; then
+    echo "Quality gate tag does not match production promotion tag." >&2
+    echo "  gate summary tag: ${SUMMARY_TAG:-not found}" >&2
+    echo "  promote tag:      $IMAGE_TAG" >&2
+    exit 1
+  fi
 
-if grep -Eq '^\|[[:space:]]*FAIL[[:space:]]*\|' "$QUALITY_GATE_SUMMARY"; then
-  echo "Quality gate summary contains failed gates. Promotion is blocked." >&2
-  exit 1
-fi
+  if grep -Eq '^\|[[:space:]]*FAIL[[:space:]]*\|' "$QUALITY_GATE_SUMMARY"; then
+    echo "Quality gate summary contains failed gates. Promotion is blocked." >&2
+    exit 1
+  fi
 
-if ! grep -Eq '^PASS\. The tested artifact is eligible for production promotion' "$QUALITY_GATE_SUMMARY"; then
-  echo "Quality gate summary does not contain a PASS promotion decision." >&2
-  exit 1
-fi
+  if ! grep -Eq '^PASS\. The tested artifact is eligible for production promotion' "$QUALITY_GATE_SUMMARY"; then
+    echo "Quality gate summary does not contain a PASS promotion decision." >&2
+    exit 1
+  fi
 
-if ! awk -v tag=":$IMAGE_TAG" '
-  /^## Tested Images/ { in_images=1; next }
-  /^## Decision/ { in_images=0 }
-  in_images && /^\| dacn-/ {
-    seen=1
-    if (index($0, tag) == 0) bad=1
-  }
-  END { exit !(seen && !bad) }
-' "$QUALITY_GATE_SUMMARY"; then
-  echo "Quality gate tested images do not all use tag $IMAGE_TAG." >&2
-  exit 1
+  if ! awk -v tag=":$IMAGE_TAG" '
+    /^## Tested Images/ { in_images=1; next }
+    /^## Decision/ { in_images=0 }
+    in_images && /^\| dacn-/ {
+      seen=1
+      if (index($0, tag) == 0) bad=1
+    }
+    END { exit !(seen && !bad) }
+  ' "$QUALITY_GATE_SUMMARY"; then
+    echo "Quality gate tested images do not all use tag $IMAGE_TAG." >&2
+    exit 1
+  fi
 fi
 
 export IMAGE_TAG
@@ -137,6 +149,10 @@ if ! grep -q "suspend: false" "$PRODUCTION_FILE"; then
   exit 1
 fi
 
-echo "Quality gate passed for imageTag $IMAGE_TAG."
+if [[ "$DEMO_ALLOW_FAILED_GATE" == "true" ]]; then
+  echo "Quality gate was bypassed for demo."
+else
+  echo "Quality gate passed for imageTag $IMAGE_TAG."
+fi
 echo "Promoted imageTag $IMAGE_TAG to production-like."
 echo "Production HelmRelease is now unsuspended."

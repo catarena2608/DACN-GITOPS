@@ -4,7 +4,7 @@ metadata:
   name: dacn
   namespace: dacn-prod
 spec:
-  suspend: true
+  suspend: false
   interval: 5m
   timeout: 15m
   releaseName: dacn-prod
@@ -35,7 +35,7 @@ spec:
     global:
       environment: production
       domain: prod.dacn.local
-      imageTag: sha-replace-after-staging-pass
+      imageTag: sha-7846f8a
     services:
       auth:
         replicaCount: 1
