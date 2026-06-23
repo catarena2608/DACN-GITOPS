@@ -1,0 +1,109 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: dacn-alert-rules
+  namespace: observability
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: dacn.application
+      rules:
+        - alert: DacnDeploymentUnavailable
+          expr: kube_deployment_status_replicas_unavailable{namespace="dacn-staging"} > 0
+          for: 5m
+          labels:
+            severity: critical
+            area: application
+          annotations:
+            summary: DACN deployment has unavailable replicas
+            description: Deployment {{ $labels.deployment }} in {{ $labels.namespace }} has unavailable replicas for more than 5 minutes.
+
+        - alert: DacnPodCrashLooping
+          expr: max_over_time(kube_pod_container_status_waiting_reason{namespace=~"dacn-staging|data",reason="CrashLoopBackOff"}[5m]) > 0
+          for: 2m
+          labels:
+            severity: critical
+            area: application
+          annotations:
+            summary: DACN pod is in CrashLoopBackOff
+            description: Pod {{ $labels.pod }} container {{ $labels.container }} in {{ $labels.namespace }} is crash looping.
+
+        - alert: DacnPodRestarting
+          expr: increase(kube_pod_container_status_restarts_total{namespace=~"dacn-staging|data"}[10m]) > 0
+          for: 2m
+          labels:
+            severity: warning
+            area: application
+          annotations:
+            summary: DACN container restarted
+            description: Pod {{ $labels.pod }} container {{ $labels.container }} in {{ $labels.namespace }} restarted during the last 10 minutes.
+
+    - name: dacn.capacity
+      rules:
+        - alert: DacnHighContainerCpu
+          expr: |
+            (
+              sum by (namespace, pod, container) (
+                rate(container_cpu_usage_seconds_total{namespace=~"dacn-staging|data",container!="",image!=""}[5m])
+              )
+              /
+              sum by (namespace, pod, container) (
+                kube_pod_container_resource_limits{namespace=~"dacn-staging|data",resource="cpu",unit="core"}
+              )
+            ) > 0.85
+          for: 10m
+          labels:
+            severity: warning
+            area: capacity
+          annotations:
+            summary: DACN container CPU is near its limit
+            description: Container {{ $labels.container }} in pod {{ $labels.pod }} is using more than 85% of its CPU limit.
+
+        - alert: DacnHighContainerMemory
+          expr: |
+            (
+              container_memory_working_set_bytes{namespace=~"dacn-staging|data",container!="",image!=""}
+              /
+              on (namespace, pod, container)
+              kube_pod_container_resource_limits{namespace=~"dacn-staging|data",resource="memory",unit="byte"}
+            ) > 0.85
+          for: 10m
+          labels:
+            severity: warning
+            area: capacity
+          annotations:
+            summary: DACN container memory is near its limit
+            description: Container {{ $labels.container }} in pod {{ $labels.pod }} is using more than 85% of its memory limit.
+
+        - alert: DacnNodeCpuSaturation
+          expr: 1 - avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.85
+          for: 10m
+          labels:
+            severity: warning
+            area: capacity
+          annotations:
+            summary: Kubernetes node CPU is saturated
+            description: Node {{ $labels.instance }} CPU usage has stayed above 85% for more than 10 minutes.
+
+        - alert: DacnNodeMemoryPressure
+          expr: 1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 0.90
+          for: 10m
+          labels:
+            severity: warning
+            area: capacity
+          annotations:
+            summary: Kubernetes node memory pressure is high
+            description: Node {{ $labels.instance }} memory usage has stayed above 90% for more than 10 minutes.
+
+    - name: dacn.observability
+      rules:
+        - alert: DacnScrapeTargetDown
+          expr: up{namespace=~"dacn-staging|data|observability"} == 0
+          for: 3m
+          labels:
+            severity: warning
+            area: observability
+          annotations:
+            summary: Prometheus scrape target is down
+            description: Target {{ $labels.job }} in {{ $labels.namespace }} has been down for more than 3 minutes.
