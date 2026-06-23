@@ -57,6 +57,8 @@ spec:
           maxReplicas: 3
           targetCPUUtilizationPercentage: 70
       product:
+        image:
+          tag: sha-de13bcc
         replicaCount: 1
         env:
           NODE_ENV: production
