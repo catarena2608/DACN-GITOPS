@@ -41,7 +41,7 @@ spec:
     services:
       auth:
         image:
-          tag: sha-c6dede8
+          tag: sha-fbb7ec2
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -61,7 +61,7 @@ spec:
           targetCPUUtilizationPercentage: 70
       product:
         image:
-          tag: sha-c6dede8
+          tag: sha-fbb7ec2
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -80,7 +80,7 @@ spec:
           targetCPUUtilizationPercentage: 70
       order:
         image:
-          tag: sha-c6dede8
+          tag: sha-fbb7ec2
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -99,7 +99,7 @@ spec:
           targetCPUUtilizationPercentage: 70
       gateway:
         image:
-          tag: sha-c6dede8
+          tag: sha-fbb7ec2
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -140,7 +140,7 @@ spec:
           targetCPUUtilizationPercentage: 70
       frontend:
         image:
-          tag: sha-c6dede8
+          tag: sha-fbb7ec2
         replicaCount: 1
         autoscaling:
           enabled: false
