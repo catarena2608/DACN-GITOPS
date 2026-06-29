@@ -49,6 +49,7 @@ spec:
           JWT_REFRESH_EXPIRES_IN: 7d
           SERVICE_NAME: auth-service
           OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
+          OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_REQUEST: x-test-run-id
         envFromSecrets:
           - dacn-auth-staging-secrets
         autoscaling:
@@ -67,6 +68,7 @@ spec:
           RABBITMQ_URL: amqp://dacn:dacn-lab-password@rabbitmq.data.svc.cluster.local:5672
           SERVICE_NAME: product-service
           OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
+          OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_REQUEST: x-test-run-id
         envFromSecrets:
           - dacn-product-staging-secrets
         autoscaling:
@@ -83,6 +85,7 @@ spec:
           RABBITMQ_URL: amqp://dacn:dacn-lab-password@rabbitmq.data.svc.cluster.local:5672
           SERVICE_NAME: order-service
           OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
+          OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_REQUEST: x-test-run-id
         envFromSecrets:
           - dacn-order-staging-secrets
         autoscaling:
@@ -103,6 +106,8 @@ spec:
           SERVICE_NAME: gateway-service
           OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability.svc.cluster.local:4317
           OTEL_TRACES_SAMPLER_ARG: "0.01"
+          OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_SERVER_REQUEST: x-test-run-id
+          OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_CLIENT_REQUEST: x-test-run-id
           GATEWAY_PROXY_MAX_SOCKETS: "2048"
           GATEWAY_PROXY_MAX_FREE_SOCKETS: "512"
           GATEWAY_PROXY_KEEP_ALIVE_MSECS: "30000"

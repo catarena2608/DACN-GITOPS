@@ -12,12 +12,26 @@ data:
             endpoint: 0.0.0.0:4317
           http:
             endpoint: 0.0.0.0:4318
+      filelog:
+        include:
+          - /var/log/pods/dacn-staging_*/*/*.log
+        start_at: end
+        include_file_path: true
+        poll_interval: 200ms
+        operators:
+          - id: container-parser
+            type: container
 
     processors:
       memory_limiter:
         check_interval: 1s
         limit_mib: 256
       batch: {}
+      resource/staging:
+        attributes:
+          - key: deployment.environment.name
+            value: staging
+            action: upsert
 
     exporters:
       debug:
@@ -39,19 +53,18 @@ data:
           processors: [memory_limiter, batch]
           exporters: [elasticsearch, otlp/jaeger, debug]
         logs:
-          receivers: [otlp]
-          processors: [memory_limiter, batch]
+          receivers: [otlp, filelog]
+          processors: [memory_limiter, resource/staging, batch]
           exporters: [elasticsearch, debug]
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   name: otel-collector
   namespace: observability
   labels:
     app.kubernetes.io/name: otel-collector
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: otel-collector
@@ -70,6 +83,10 @@ spec:
               containerPort: 4317
             - name: otlp-http
               containerPort: 4318
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            readOnlyRootFilesystem: true
           resources:
             requests:
               cpu: 100m
@@ -80,10 +97,18 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /etc/otelcol
+              readOnly: true
+            - name: pod-logs
+              mountPath: /var/log/pods
+              readOnly: true
       volumes:
         - name: config
           configMap:
             name: otel-collector-config
+        - name: pod-logs
+          hostPath:
+            path: /var/log/pods
+            type: Directory
 ---
 apiVersion: v1
 kind: Service
