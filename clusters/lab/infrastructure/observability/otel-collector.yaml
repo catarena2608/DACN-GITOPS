@@ -51,7 +51,7 @@ data:
         traces:
           receivers: [otlp]
           processors: [memory_limiter, batch]
-          exporters: [elasticsearch, otlp/jaeger, debug]
+          exporters: [otlp/jaeger, debug]
         logs:
           receivers: [otlp, filelog]
           processors: [memory_limiter, resource/staging, batch]
