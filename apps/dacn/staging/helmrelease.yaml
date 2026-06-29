@@ -40,6 +40,8 @@ spec:
         - name: ghcr-pull-secret
     services:
       auth:
+        image:
+          tag: sha-c6dede8
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -59,7 +61,7 @@ spec:
           targetCPUUtilizationPercentage: 70
       product:
         image:
-          tag: sha-8f87160
+          tag: sha-c6dede8
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -77,6 +79,8 @@ spec:
           maxReplicas: 6
           targetCPUUtilizationPercentage: 70
       order:
+        image:
+          tag: sha-c6dede8
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -95,7 +99,7 @@ spec:
           targetCPUUtilizationPercentage: 70
       gateway:
         image:
-          tag: sha-8f87160
+          tag: sha-c6dede8
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -135,6 +139,8 @@ spec:
           maxReplicas: 6
           targetCPUUtilizationPercentage: 70
       frontend:
+        image:
+          tag: sha-c6dede8
         replicaCount: 1
         autoscaling:
           enabled: false
