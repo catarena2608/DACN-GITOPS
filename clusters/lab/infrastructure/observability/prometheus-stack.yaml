@@ -24,6 +24,13 @@ spec:
       adminPassword: dacn-lab-admin
       service:
         type: ClusterIP
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotations:
+          kubernetes.io/ingress.class: traefik
+        hosts:
+          - grafana.dacn.local
     prometheus:
       prometheusSpec:
         retention: 2d
