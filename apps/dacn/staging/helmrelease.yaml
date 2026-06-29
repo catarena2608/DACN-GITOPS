@@ -59,7 +59,7 @@ spec:
           targetCPUUtilizationPercentage: 70
       product:
         image:
-          tag: sha-de13bcc
+          tag: sha-8f87160
         replicaCount: 1
         env:
           NODE_ENV: production
@@ -94,6 +94,8 @@ spec:
           maxReplicas: 3
           targetCPUUtilizationPercentage: 70
       gateway:
+        image:
+          tag: sha-8f87160
         replicaCount: 1
         env:
           NODE_ENV: production
